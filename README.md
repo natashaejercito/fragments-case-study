@@ -67,22 +67,22 @@ incrementally across the term.
 ## 3. Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
     U[User in browser] -->|Hosted UI login| C[(Amazon Cognito<br/>User Pool)]
     C -->|ID token| UI[fragments-ui<br/>Parcel + oidc-client-ts]
-    UI -->|"Authorization: Bearer &lt;id_token&gt;"| API
+    UI -->|"Bearer ID token"| API
 
     subgraph API[fragments service · Express]
       direction TB
       MW[pino-http · helmet · cors · compression] --> R[Router]
-      R -->|GET /| H[Health check]
-      R -->|/v1/*| A[authenticate&#40;&#41;]
-      A --> V1[API routes<br/>GET / POST /fragments]
+      R -->|"GET /"| H[Health check]
+      R -->|"/v1/*"| A["authenticate()"]
+      A --> V1["API routes<br/>GET and POST /fragments"]
       V1 --> M[Fragment model]
       M --> D[Data layer]
     end
 
-    A -.verify JWT via JWKS.-> C
+    A -. "verify JWT via JWKS" .-> C
     D --> MEM[(MemoryDB: metadata)]
     D --> BLOB[(MemoryDB: data)]
 ```
